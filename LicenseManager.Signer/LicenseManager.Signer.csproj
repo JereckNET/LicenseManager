@@ -20,4 +20,7 @@
     <ProjectReference Include="..\LicenseManager\LicenseManager.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="IF EXIST &quot;$(SolutionDir)\..\SignCode.cmd&quot; (&#xD;&#xA;   CALL &quot;$(SolutionDir)\..\SignCode.cmd&quot; &quot;$(DevEnvDir)&quot; &quot;$(TargetPath)&quot;&#xD;&#xA;)" />
+  </Target>
 </Project>

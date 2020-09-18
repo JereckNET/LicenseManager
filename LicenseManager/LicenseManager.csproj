@@ -17,11 +17,11 @@
     <PackageId>JereckNET.LicenseManager</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile></DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\JereckNET.Consulting.LicenseManager.xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>JereckNET.Consulting.LicenseManager.xml</DocumentationFile>
-  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="IF EXIST &quot;$(SolutionDir)\..\SignCode.cmd&quot; (CALL &quot;$(SolutionDir)\..\SignCode.cmd&quot; &quot;$(DevEnvDir)&quot; &quot;$(TargetPath)&quot;)" />
+  </Target>
 </Project>
