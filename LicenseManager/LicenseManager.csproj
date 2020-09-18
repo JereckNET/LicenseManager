@@ -11,10 +11,16 @@
     <Owners>Jereck, Jereck.NET-Consulting</Owners>
     <Company>Jereck.NET Consulting</Company>
     <Product>License Manager</Product>
-    <Copyright>Copyright (c) 2020 Jereck.NET Consulting.</Copyright>
+    <Copyright>Copyright © Jereck.NET Consulting 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>JereckNET.LicenseManager</PackageId>
+    <PackageProjectUrl>https://github.com/JereckNET/LicenseManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JereckNET/LicenseManager.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>Adds easy support for signed license files.</Description>
+    <Version>1.0.1</Version>
+    <PackageIcon>License Manager.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,4 +30,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
     <Exec Command="IF EXIST &quot;$(SolutionDir)\..\SignCode.cmd&quot; (CALL &quot;$(SolutionDir)\..\SignCode.cmd&quot; &quot;$(DevEnvDir)&quot; &quot;$(TargetPath)&quot;)" />
   </Target>
+
+  <ItemGroup>
+    <None Include="License Manager.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 </Project>
