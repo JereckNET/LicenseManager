@@ -9,6 +9,9 @@ using System.Xml;
 using System.Xml.Serialization;
 
 namespace JereckNET.LicenseManager {
+    /// <summary>
+    /// Represents a signable licence file or <see cref="Stream"/>.
+    /// </summary>
     public class License {
         private const string START_OF_FILE =    "-----BEGIN LICENSE-----";
         private const string END_OF_FILE =      "-----END LICENSE-----";
