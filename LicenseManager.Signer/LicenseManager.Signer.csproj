@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!--<TargetFramework>net48</TargetFramework>-->
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net48</TargetFrameworks>
+    <RootNamespace>JereckNET.LicenseManager.Signer</RootNamespace>
+    <AssemblyName>License Manager</AssemblyName>
+    <Authors>Olivier PIRLET</Authors>
+    <Company>Jereck.NET Consulting</Company>
+    <Product>License Manager</Product>
+    <Copyright>Copyright (c) 2020 Jereck.NET Consulting.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>JereckNET.Consulting.LicenseManager.Signer</PackageId>
+    <StartupObject>JereckNET.LicenseManager.Signer.Program</StartupObject>
+    <ApplicationIcon>Manager.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LicenseManager\LicenseManager.csproj" />
+  </ItemGroup>
+
+</Project>

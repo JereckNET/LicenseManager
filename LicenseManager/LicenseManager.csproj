@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--<TargetFramework>net48</TargetFramework>-->
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net48</TargetFrameworks>
+    <RootNamespace>JereckNET.LicenseManager</RootNamespace>
+    <AssemblyName>JereckNET.LicenseManager</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>LicenseManager.snk</AssemblyOriginatorKeyFile>
+    <Authors>Olivier PIRLET</Authors>
+    <Owners>Jereck, Jereck.NET-Consulting</Owners>
+    <Company>Jereck.NET Consulting</Company>
+    <Product>License Manager</Product>
+    <Copyright>Copyright (c) 2020 Jereck.NET Consulting.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>JereckNET.LicenseManager</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>JereckNET.Consulting.LicenseManager.xml</DocumentationFile>
+  </PropertyGroup>
+</Project>
