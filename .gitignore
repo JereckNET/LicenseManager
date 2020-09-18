@@ -348,3 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Remove launch settings that may contain local information
+[Pp]roperties/launchSettings.json
