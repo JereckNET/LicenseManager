@@ -1,6 +1,6 @@
 # ![License Manager Logo](images/Manager.png) License Manager
 
-License Manager is a tool that allows developpers to easily create software license files with a digital signature.
+License Manager is a tool that allows developers to easily create software license files with a digital signature.
 
 * [Installation](#installation)
   * [To use signed license files in your application](#to-use-signed-license-files-in-your-application)
