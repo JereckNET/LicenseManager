@@ -350,4 +350,5 @@ MigrationBackup/
 .ionide/
 
 # Remove launch settings that may contain local information
-[Pp]roperties/launchSettings.json
+/**/[Pp]roperties/launchSettings.json
+
