@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Security;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace JereckNET.LicenseManager.Signer {
     internal class Manager {
@@ -12,6 +14,8 @@ namespace JereckNET.LicenseManager.Signer {
             _applicationName = applicationName;
         }
         public void Run() {
+            bool result;
+
             if (_arguments.HasError) {
                 if (_arguments.ShowHelp) {
                     showUsage(_applicationName);
@@ -25,13 +29,17 @@ namespace JereckNET.LicenseManager.Signer {
                         break;
 
                     case Operations.Sign:
-                        signLicense(_arguments.PrivateKeyFilePath, _arguments.LicenseContentPath, _arguments.LicensePath, _arguments.Base64);
-                        Console.WriteLine("License content signed.");
+                        result = signLicense(_arguments.PrivateKeyFilePath, _arguments.LicenseContentPath, _arguments.LicensePath, _arguments.Base64);
+                        if (result) {
+                            Console.WriteLine("License content signed.");
+                        } else {
+                            Console.WriteLine("License content could not be signed.");
+                        }
 
                         break;
 
                     case Operations.Verify:
-                        bool result = verifyLicense(_arguments.PublicKeyFilePath, _arguments.LicensePath);
+                        result = verifyLicense(_arguments.PublicKeyFilePath, _arguments.LicensePath);
 
                         if (result) {
                             Console.WriteLine("The license signature is valid.");
@@ -79,12 +87,11 @@ namespace JereckNET.LicenseManager.Signer {
             Console.WriteLine("");
         }
 
-        private void generateKeys(string publicKeyFilePath, string privateKeyFilePath, int keySize = 2048) {
+        private void generateKeys(string publicKeyFilePath, string privateKeyFilePath) {
             string publicKey;
             string privateKey;
 
-            using (RSACryptoServiceProvider provider = new RSACryptoServiceProvider(keySize)) {
-
+            using (RSACryptoServiceProvider provider = new RSACryptoServiceProvider(2048)) {
                 publicKey = provider.ToXmlString(false);
                 privateKey = provider.ToXmlString(true);
             }
@@ -99,25 +106,67 @@ namespace JereckNET.LicenseManager.Signer {
             }
         }
 
-        private void signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64) {
-            string privateKey = File.ReadAllText(privateKeyFilePath);
+        private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, int keySize = 2048) {
+            bool result = false;
+            
             string licenseContent = File.ReadAllText(licenseContentPath);
 
             License newLicense = new License() {
                 Content = licenseContent
             };
 
-            newLicense.Sign(privateKey);
-            newLicense.Save(licenseFilePath, base64);
+            if (new FileInfo(privateKeyFilePath).Extension != ".pfx"){
+
+                string privateKey = File.ReadAllText(privateKeyFilePath);
+
+                result = newLicense.Sign(privateKey, keySize);
+            } else {
+                SecureString importPassword;
+
+                if (true) {
+                    Console.Write("Please type the import password: ");
+                    importPassword = Program.GetConsoleSecurePassword();
+                }
+
+                try {
+                    X509Certificate2 certificate = new X509Certificate2(privateKeyFilePath, importPassword,
+                        X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+
+                    result = newLicense.Sign(certificate);
+                }catch(CryptographicException ex) {
+                    Console.WriteLine("ERROR : " + ex.Message);
+                }
+            }
+
+            if(result)
+                newLicense.Save(licenseFilePath, base64);
+
+            return result;
         }
-        private bool verifyLicense(string _publicKeyFilePath, string _licenseFilePath) {
-            string publicKey = File.ReadAllText(_publicKeyFilePath);
+        private bool verifyLicense(string publicKeyFilePath, string licenseFilePath) {
+            bool result;
 
-            License licenseToVerify = License.Load(_licenseFilePath);
+            License licenseToVerify = License.Load(licenseFilePath);
 
-            bool? result = licenseToVerify?.Verify(publicKey);
+            if (licenseToVerify == null)
+                throw new ArgumentException("License file could not be read.");
 
-            return result ?? false;
+            if (new FileInfo(publicKeyFilePath).Extension != ".crt") {
+                string publicKey = File.ReadAllText(publicKeyFilePath);
+
+                result = licenseToVerify.Verify(publicKey);
+            } else {
+                try {
+                    X509Certificate2 certificate = new X509Certificate2(publicKeyFilePath);
+
+                    result = licenseToVerify.Verify(certificate);
+                } catch (CryptographicException ex) {
+                    Console.WriteLine("ERROR : " + ex.Message);
+                    result = false;
+                }
+            }
+
+            return result;
         }
     }
 }
