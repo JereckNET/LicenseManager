@@ -13,6 +13,7 @@ namespace JereckNET.LicenseManager {
     /// <summary>
     /// Represents a signable licence file or <see cref="Stream"/>.
     /// </summary>
+    [XmlRoot("license")]
     public class License {
         private const string START_OF_FILE = "-----BEGIN LICENSE-----";
         private const string END_OF_FILE = "-----END LICENSE-----";
@@ -21,7 +22,8 @@ namespace JereckNET.LicenseManager {
         /// <summary>
         /// The license payload. Can be any serializable content (Text, XML, Json, Base64, ...).
         /// </summary>
-        public string Content {
+        [XmlElement("content")]
+        public byte[] Content {
             get;
             set;
         }
@@ -29,6 +31,7 @@ namespace JereckNET.LicenseManager {
         /// <summary>
         /// The license signature.
         /// </summary>
+        [XmlElement("signature")]
         public byte[] Signature {
             get;
             set;
@@ -165,7 +168,7 @@ namespace JereckNET.LicenseManager {
                 using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
                     csp.FromXmlString(PublicKey);
 
-                    result = csp.VerifyData(Encoding.UTF8.GetBytes(Content), SHA256.Create(), Signature);
+                    result = csp.VerifyData(Content, SHA256.Create(), Signature);
                 }
             } catch (Exception ex) {
                 Debugger.Log(1, "Verify", ex.Message);
@@ -182,7 +185,7 @@ namespace JereckNET.LicenseManager {
             bool result = false;
             try {
                 using (RSACryptoServiceProvider csp = (RSACryptoServiceProvider)Certificate.PublicKey.Key) {
-                    result = csp.VerifyData(Encoding.UTF8.GetBytes(Content), SHA256.Create(), Signature);
+                    result = csp.VerifyData(Content, SHA256.Create(), Signature);
                 }
 
             } catch (Exception ex) {
@@ -206,7 +209,7 @@ namespace JereckNET.LicenseManager {
                 using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
                     csp.FromXmlString(PrivateKey);
 
-                    Signature = csp.SignData(Encoding.UTF8.GetBytes(Content), SHA256.Create());
+                    Signature = csp.SignData(Content, SHA256.Create());
 
                     result = true;
                 }

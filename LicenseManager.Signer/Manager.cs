@@ -109,9 +109,9 @@ namespace JereckNET.LicenseManager.Signer {
         private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, int keySize = 2048) {
             bool result = false;
             
-            string licenseContent = File.ReadAllText(licenseContentPath);
+            byte[] licenseContent = File.ReadAllBytes(licenseContentPath);
 
-            License newLicense = new License() {
+            License newLicense = new License {
                 Content = licenseContent
             };
 
