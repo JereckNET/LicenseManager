@@ -18,9 +18,16 @@ namespace JereckNET.LicenseManager {
         private const string START_OF_FILE = "-----BEGIN LICENSE-----";
         private const string END_OF_FILE = "-----END LICENSE-----";
 
+        /// <summary>
+        /// Creates a new <see cref="License"/> instance.
+        /// </summary>
+        public License() {
+            Signature = new Signature();
+        }
+
         #region Properties
         /// <summary>
-        /// The license payload. Can be any serializable content (Text, XML, Json, Base64, ...).
+        /// The license payload as a byte array.
         /// </summary>
         [XmlElement("content")]
         public byte[] Content {
@@ -29,10 +36,10 @@ namespace JereckNET.LicenseManager {
         }
 
         /// <summary>
-        /// The license signature.
+        /// The license <see cref="Signature"/>.
         /// </summary>
         [XmlElement("signature")]
-        public byte[] Signature {
+        public Signature Signature {
             get;
             set;
         }
@@ -94,7 +101,6 @@ namespace JereckNET.LicenseManager {
             }
             return result;
         }
-
         #endregion
 
         #region Save()
@@ -105,14 +111,25 @@ namespace JereckNET.LicenseManager {
         /// <param name="Base64Encode"><see langword="true"/> to generate a Base64 encoded file.</param>
         /// <returns><see langword="true"/> if the license was saved successfully.</returns>
         public bool Save(string FilePath, bool Base64Encode = false) {
+            return Save(FilePath, out _, Base64Encode);
+        }
+        /// <summary>
+        /// Saves a signed license file to the file system.
+        /// </summary>
+        /// <param name="FilePath">The path of the signed license file.</param>
+        /// <param name="Error">The exception that prevented the file to be saved.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
+        /// <param name="Base64Encode"><see langword="true"/> to generate a Base64 encoded file.</param>
+        /// <returns><see langword="true"/> if the license was saved successfully.</returns>
+        public bool Save(string FilePath, out Exception Error, bool Base64Encode = false) {
             bool result;
             try {
                 using (FileStream fs = new FileStream(FilePath, FileMode.Create, FileAccess.Write)) {
-                    result = Save(fs, Base64Encode);
+                    result = Save(fs, out Error, Base64Encode);
                 }
 
             } catch (Exception ex) {
                 Debugger.Log(1, "Save", ex.Message);
+                Error = ex;
                 result = false;
             }
             return result;
@@ -125,17 +142,34 @@ namespace JereckNET.LicenseManager {
         /// <param name="Base64Encode"><see langword="true"/> to generate a Base64 encoded content.</param>
         /// <returns><see langword="true"/> if the license was saved successfully.</returns>
         public bool Save(Stream Destination, bool Base64Encode = false) {
+            return Save(Destination, out _, Base64Encode);
+        }
+        /// <summary>
+        /// Saves a signed license file to a stream.
+        /// </summary>
+        /// <param name="Destination">The <see cref="Stream"/> for the signed license.</param>
+        /// <param name="Error">The exception that prevented the <see cref="Stream"/> to be saved.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
+        /// <param name="Base64Encode"><see langword="true"/> to generate a Base64 encoded content.</param>
+        /// <returns><see langword="true"/> if the license was saved successfully.</returns>
+        public bool Save(Stream Destination, out Exception Error, bool Base64Encode = false) {
+            Error = null;
             bool result;
             string content;
 
             try {
-                using (StringWriter sw = new StringWriter()) {
-                    using (XmlTextWriter xmlTextWriter = new XmlTextWriter(sw)) {
-                        new XmlSerializer(typeof(License)).Serialize(xmlTextWriter, this);
-                    }
+                XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+                namespaces.Add("", "");
 
-                    content = sw.ToString();
+                StringBuilder buffer = new StringBuilder();
+                XmlWriterSettings settings = new XmlWriterSettings {
+                    Indent = true
+                };
+
+                using (XmlWriter writer = XmlWriter.Create(buffer, settings)) {
+                    new XmlSerializer(typeof(License)).Serialize(writer, this, namespaces);
                 }
+
+                content = buffer.ToString();
 
                 if (Base64Encode) {
                     content = base64Encode(content);
@@ -148,8 +182,10 @@ namespace JereckNET.LicenseManager {
 
             } catch (Exception ex) {
                 Debugger.Log(1, "Save", ex.Message);
+                Error = ex;
                 result = false;
             }
+
             return result;
         }
 
@@ -163,16 +199,32 @@ namespace JereckNET.LicenseManager {
         /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
         /// <returns><see langword="true"/> if the <see cref="Signature"/> corresponds to the <see cref="Content"/>.</returns>
         public bool Verify(string PublicKey, int KeySize = 2048) {
-            bool result = false;
+            return Verify(PublicKey, out _, KeySize);
+        }
+        /// <summary>
+        /// Checks the validity of the signature.
+        /// </summary>
+        /// <param name="PublicKey">The XML encoded public key for your application license.<br />This key can be distributed freely.</param>
+        /// <param name="Error">The exception that prevented the signature to be verified.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
+        /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
+        /// <returns><see langword="true"/> if the <see cref="Signature"/> corresponds to the <see cref="Content"/>.</returns>
+        public bool Verify(string PublicKey, out Exception Error, int KeySize = 2048) {
+            Error = null;
+            bool result;
+
             try {
                 using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
                     csp.FromXmlString(PublicKey);
 
-                    result = csp.VerifyData(Content, SHA256.Create(), Signature);
+                    result = csp.VerifyData(Content, SHA256.Create(), Signature.Content);
                 }
+
             } catch (Exception ex) {
                 Debugger.Log(1, "Verify", ex.Message);
+                Error = ex;
+                result = false;
             }
+
             return result;
         }
 
@@ -182,15 +234,29 @@ namespace JereckNET.LicenseManager {
         /// <param name="Certificate">The <see cref="X509Certificate2"/> containing the public key used to sign your application license.<br />This certificate can be distributed freely assuming it does not contains the private key.</param>
         /// <returns><see langword="true"/> if the <see cref="Signature"/> corresponds to the <see cref="Content"/>.</returns>
         public bool Verify(X509Certificate2 Certificate) {
-            bool result = false;
+            return Verify(Certificate, out _);
+        }
+        /// <summary>
+        /// Checks the validity of the signature.
+        /// </summary>
+        /// <param name="Certificate">The <see cref="X509Certificate2"/> containing the public key used to sign your application license.<br />This certificate can be distributed freely assuming it does not contains the private key.</param>
+        /// <param name="Error">The exception that prevented the signature to be verified.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the <see cref="Signature"/> corresponds to the <see cref="Content"/>.</returns>
+        public bool Verify(X509Certificate2 Certificate, out Exception Error) {
+            bool result;
+            Error = null;
+
             try {
                 using (RSACryptoServiceProvider csp = (RSACryptoServiceProvider)Certificate.PublicKey.Key) {
-                    result = csp.VerifyData(Content, SHA256.Create(), Signature);
+                    result = csp.VerifyData(Content, SHA256.Create(), Signature.Content);
                 }
 
             } catch (Exception ex) {
                 Debugger.Log(1, "Verify", ex.Message);
+                Error = ex;
+                result = false;
             }
+
             return result;
         }
         #endregion
@@ -203,18 +269,30 @@ namespace JereckNET.LicenseManager {
         /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
         public bool Sign(string PrivateKey, int KeySize = 2048) {
+            return Sign(PrivateKey, out _, KeySize);
+        }
+        /// <summary>
+        /// Generate the license signature and stores it in the <see cref="Signature"/> property.
+        /// </summary>
+        /// <param name="PrivateKey">The XML encoded private key for your application license.<br />This key <strong>MUST NEVER</strong> be distributed.</param>
+        /// <param name="Error">The exception that prevented the payload to be signed.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
+        /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
+        /// <returns><see langword="true"/> if the signature was successfully created.</returns>
+        public bool Sign(string PrivateKey, out Exception Error, int KeySize = 2048) {
+            Error = null;
             bool result;
 
             try {
                 using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
                     csp.FromXmlString(PrivateKey);
 
-                    Signature = csp.SignData(Content, SHA256.Create());
+                    Signature.Content = csp.SignData(Content, SHA256.Create());
 
                     result = true;
                 }
             } catch (Exception ex) {
                 Debugger.Log(1, "Sign", ex.Message);
+                Error = ex;
                 Signature = null;
                 result = false;
             }
@@ -226,16 +304,26 @@ namespace JereckNET.LicenseManager {
         /// Generate the license signature and stores it in the <see cref="Signature"/> property.
         /// </summary>
         /// <param name="Certificate">The <see cref="X509Certificate2"/> containing the private key used to sign your application license.<br />This certificate <strong>MUST NEVER</strong> be distributed.</param>
+        /// <param name="Error">The exception that prevented the payload to be signed.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
         /// <exception cref="ArgumentException">Thrown if the <see cref="X509Certificate2"/> does not contains a private key.</exception>
         public bool Sign(X509Certificate2 Certificate) {
+            return Sign(Certificate, out _);
+        }
+        /// <summary>
+        /// Generate the license signature and stores it in the <see cref="Signature"/> property.
+        /// </summary>
+        /// <param name="Certificate">The <see cref="X509Certificate2"/> containing the private key used to sign your application license.<br />This certificate <strong>MUST NEVER</strong> be distributed.</param>
+        /// <returns><see langword="true"/> if the signature was successfully created.</returns>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="X509Certificate2"/> does not contains a private key.</exception>
+        public bool Sign(X509Certificate2 Certificate, out Exception Error) {
             if (!Certificate.HasPrivateKey)
                 throw new ArgumentException("The certificate must contain a private key", nameof(Certificate));
 
             string privateKeyXml = Certificate.PrivateKey.ToXmlString(true);
             int keySize = Certificate.PrivateKey.KeySize;
 
-            return Sign(privateKeyXml, keySize);
+            return Sign(privateKeyXml, out Error, keySize);
         }
         #endregion
 

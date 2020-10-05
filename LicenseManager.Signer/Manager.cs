@@ -29,22 +29,31 @@ namespace JereckNET.LicenseManager.Signer {
                         break;
 
                     case Operations.Sign:
-                        result = signLicense(_arguments.PrivateKeyFilePath, _arguments.LicenseContentPath, _arguments.LicensePath, _arguments.Base64);
-                        if (result) {
-                            Console.WriteLine("License content signed.");
-                        } else {
-                            Console.WriteLine("License content could not be signed.");
+                        try {
+                            result = signLicense(_arguments.PrivateKeyFilePath, _arguments.LicenseContentPath, _arguments.LicensePath, _arguments.Base64);
+
+                            if (result) {
+                                Console.WriteLine("License content signed.");
+                            } else {
+                                Console.WriteLine("License content could not be signed.");
+                            }
+                        } catch (Exception ex) {
+                            Console.WriteLine("ERROR : " + ex.Message);
                         }
 
                         break;
 
                     case Operations.Verify:
-                        result = verifyLicense(_arguments.PublicKeyFilePath, _arguments.LicensePath);
+                        try {
+                            result = verifyLicense(_arguments.PublicKeyFilePath, _arguments.LicensePath);
 
-                        if (result) {
-                            Console.WriteLine("The license signature is valid.");
-                        } else {
-                            Console.WriteLine("The license signature is not valid.");
+                            if (result) {
+                                Console.WriteLine("The license signature is valid.");
+                            } else {
+                                Console.WriteLine("The license signature is not valid.");
+                            }
+                        } catch (Exception ex) {
+                            Console.WriteLine("ERROR : " + ex.Message);
                         }
 
                         break;
@@ -108,14 +117,14 @@ namespace JereckNET.LicenseManager.Signer {
 
         private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, int keySize = 2048) {
             bool result = false;
-            
+
             byte[] licenseContent = File.ReadAllBytes(licenseContentPath);
 
-            License newLicense = new License {
+            License newLicense = new License() {
                 Content = licenseContent
             };
 
-            if (new FileInfo(privateKeyFilePath).Extension != ".pfx"){
+            if (new FileInfo(privateKeyFilePath).Extension != ".pfx") {
 
                 string privateKey = File.ReadAllText(privateKeyFilePath);
 
@@ -128,17 +137,13 @@ namespace JereckNET.LicenseManager.Signer {
                     importPassword = Program.GetConsoleSecurePassword();
                 }
 
-                try {
-                    X509Certificate2 certificate = new X509Certificate2(privateKeyFilePath, importPassword,
-                        X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+                X509Certificate2 certificate = new X509Certificate2(privateKeyFilePath, importPassword,
+                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
 
-                    result = newLicense.Sign(certificate);
-                }catch(CryptographicException ex) {
-                    Console.WriteLine("ERROR : " + ex.Message);
-                }
+                result = newLicense.Sign(certificate);
             }
 
-            if(result)
+            if (result)
                 newLicense.Save(licenseFilePath, base64);
 
             return result;
@@ -156,14 +161,9 @@ namespace JereckNET.LicenseManager.Signer {
 
                 result = licenseToVerify.Verify(publicKey);
             } else {
-                try {
-                    X509Certificate2 certificate = new X509Certificate2(publicKeyFilePath);
+                X509Certificate2 certificate = new X509Certificate2(publicKeyFilePath);
 
-                    result = licenseToVerify.Verify(certificate);
-                } catch (CryptographicException ex) {
-                    Console.WriteLine("ERROR : " + ex.Message);
-                    result = false;
-                }
+                result = licenseToVerify.Verify(certificate);
             }
 
             return result;
