@@ -115,12 +115,12 @@ namespace JereckNET.LicenseManager.Signer {
             }
         }
 
-        private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, int keySize = 2048) {
-            bool result = false;
+        private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, string algorithm = "SHA256", int keySize = 2048) {
+            bool result;
 
             byte[] licenseContent = File.ReadAllBytes(licenseContentPath);
 
-            License newLicense = new License() {
+            License newLicense = new License(algorithm) {
                 Content = licenseContent
             };
 

@@ -19,10 +19,18 @@ namespace JereckNET.LicenseManager {
         private const string END_OF_FILE = "-----END LICENSE-----";
 
         /// <summary>
+        /// Creates a new <see cref="License"/> instance with SHA256 signature algorithm.
+        /// </summary>
+        public License(){
+            Signature = new Signature("SHA256");
+        }
+        /// <summary>
         /// Creates a new <see cref="License"/> instance.
         /// </summary>
-        public License() {
-            Signature = new Signature();
+        /// <param name="Algorithm">The algorithm used to sign licenses. <br />Supported values are : SHA, SHA1, MD5, SHA256, SHA384, SHA512</param>
+        /// <remarks>Supported algoritms are provided by <see cref="HashAlgorithm"/> and the list could be expanded by the framework.</remarks>
+        public License(string Algorithm) {
+            Signature = new Signature(Algorithm);
         }
 
         #region Properties
@@ -216,7 +224,7 @@ namespace JereckNET.LicenseManager {
                 using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
                     csp.FromXmlString(PublicKey);
 
-                    result = csp.VerifyData(Content, SHA256.Create(), Signature.Content);
+                    result = csp.VerifyData(Content, Signature.Algorithm, Signature.Content);
                 }
 
             } catch (Exception ex) {
@@ -248,7 +256,7 @@ namespace JereckNET.LicenseManager {
 
             try {
                 using (RSACryptoServiceProvider csp = (RSACryptoServiceProvider)Certificate.PublicKey.Key) {
-                    result = csp.VerifyData(Content, SHA256.Create(), Signature.Content);
+                    result = csp.VerifyData(Content, Signature.Algorithm, Signature.Content);
                 }
 
             } catch (Exception ex) {
@@ -286,7 +294,7 @@ namespace JereckNET.LicenseManager {
                 using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
                     csp.FromXmlString(PrivateKey);
 
-                    Signature.Content = csp.SignData(Content, SHA256.Create());
+                    Signature.Content = csp.SignData(Content, Signature.Algorithm);
 
                     result = true;
                 }
