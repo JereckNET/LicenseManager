@@ -274,24 +274,22 @@ namespace JereckNET.LicenseManager {
         /// Generate the license signature and stores it in the <see cref="Signature"/> property.
         /// </summary>
         /// <param name="PrivateKey">The XML encoded private key for your application license.<br />This key <strong>MUST NEVER</strong> be distributed.</param>
-        /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
-        public bool Sign(string PrivateKey, int KeySize = 2048) {
-            return Sign(PrivateKey, out _, KeySize);
+        public bool Sign(string PrivateKey) {
+            return Sign(PrivateKey, out _);
         }
         /// <summary>
         /// Generate the license signature and stores it in the <see cref="Signature"/> property.
         /// </summary>
         /// <param name="PrivateKey">The XML encoded private key for your application license.<br />This key <strong>MUST NEVER</strong> be distributed.</param>
         /// <param name="Error">The exception that prevented the payload to be signed.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
-        /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
-        public bool Sign(string PrivateKey, out Exception Error, int KeySize = 2048) {
+        public bool Sign(string PrivateKey, out Exception Error) {
             Error = null;
             bool result;
 
             try {
-                using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
+                using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider()) {
                     csp.FromXmlString(PrivateKey);
 
                     Signature.Content = csp.SignData(Content, Signature.Algorithm);
@@ -331,7 +329,7 @@ namespace JereckNET.LicenseManager {
             string privateKeyXml = Certificate.PrivateKey.ToXmlString(true);
             int keySize = Certificate.PrivateKey.KeySize;
 
-            return Sign(privateKeyXml, out Error, keySize);
+            return Sign(privateKeyXml, out Error);
         }
         #endregion
 

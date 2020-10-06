@@ -23,14 +23,14 @@ namespace JereckNET.LicenseManager.Signer {
             } else {
                 switch (_arguments.Operation) {
                     case Operations.GenerateKey:
-                        generateKeys(_arguments.PublicKeyFilePath, _arguments.PrivateKeyFilePath);
+                        generateKeys(_arguments.PublicKeyFilePath, _arguments.PrivateKeyFilePath, _arguments.KeySize);
                         Console.WriteLine("Keys created.");
 
                         break;
 
                     case Operations.Sign:
                         try {
-                            result = signLicense(_arguments.PrivateKeyFilePath, _arguments.LicenseContentPath, _arguments.LicensePath, _arguments.Base64);
+                            result = signLicense(_arguments.PrivateKeyFilePath, _arguments.LicenseContentPath, _arguments.LicensePath, _arguments.Base64, _arguments.Algorithm, _arguments.ImportPassword);
 
                             if (result) {
                                 Console.WriteLine("License content signed.");
@@ -71,36 +71,39 @@ namespace JereckNET.LicenseManager.Signer {
             Console.WriteLine($"{applicationName}.exe [{{ /generateKeys | /signLicense | /verifyLicense }} <options>]");
             Console.WriteLine("");
 
-            Console.WriteLine("/generateKeys <Public Key Path> <Private Key Path>");
+            Console.WriteLine("/generateKeys <Public Key Path> <Private Key Path> [/keySize:<Key Size>]");
             Console.WriteLine("\tGenerates a public/private keys pair and stores them in the specified files.");
             Console.WriteLine("");
-            Console.WriteLine("\t<Public Key Path>\tThe path of the file that will contain the generated public key");
-            Console.WriteLine("\t<Private Key Path>\tThe path of the file that will contain the generated private key");
+            Console.WriteLine("\tPublic Key Path\t\tThe path of the file that will contain the generated public key.");
+            Console.WriteLine("\tPrivate Key Path\tThe path of the file that will contain the generated private key.");
+            Console.WriteLine("\tKey Size\t\tThe size of the keys. Must be a multiple of 8, between 384 and 16384 [Default: 2048].");
             Console.WriteLine("");
 
-            Console.WriteLine("/sign <Private Key Path> <License Content Path> <License Path> [/base64]");
+            Console.WriteLine("/sign <Private Key Path> <License Content Path> <License Path> [/algorithm:<Algorithm>] [/base64] [/password:<Password>]");
             Console.WriteLine("\tUses the specified private key to sign the license content and generates a signed license file.");
             Console.WriteLine("");
-            Console.WriteLine("\t<Private Key Path>\tThe path of the file that contains the private key");
-            Console.WriteLine("\t<License Content Path>\tThe path of the file that contains the license content");
-            Console.WriteLine("\t<License Path>\t\tThe path of the file that will contain the signed license");
-            Console.WriteLine("\t/base64\t\t\tWill generate a Base64-encoded file instead of an XML file.");
+            Console.WriteLine("\tPrivate Key Path\tThe path of the file that contains the private key.");
+            Console.WriteLine("\tLicense Content Path\tThe path of the file that contains the license content.");
+            Console.WriteLine("\tLicense Path\t\tThe path of the file that will contain the signed license.");
+            Console.WriteLine("\tAlgorithm\t\tThe algorithm to use for the signature process [Default: SHA256].");
+            Console.WriteLine("\t\t\t\t  Accepted values are : SHA, SHA1, MD5, SHA256, SHA384, SHA512");
+            Console.WriteLine("\t/base64\t\t\tGenerates a Base64-encoded file instead of an XML file.");
+            Console.WriteLine("\tPassword\t\tThe password for the private key file.");
             Console.WriteLine("");
 
             Console.WriteLine("/verify <Public Key Path> <License Path>");
+            Console.WriteLine("\tChecks the validity of a license file against a specified public key.");
             Console.WriteLine("");
-            Console.WriteLine("\tChecks the validity of a license file against a specified public key");
-            Console.WriteLine("");
-            Console.WriteLine("\t<Public Key Path>\tThe path of the file that contains the public key");
-            Console.WriteLine("\t<License Path>\t\tThe path of the file that contains the license to check");
+            Console.WriteLine("\tPublic Key Path\t\tThe path of the file that contains the public key.");
+            Console.WriteLine("\tLicense Path\t\tThe path of the file that contains the license to check.");
             Console.WriteLine("");
         }
 
-        private void generateKeys(string publicKeyFilePath, string privateKeyFilePath) {
+        private void generateKeys(string publicKeyFilePath, string privateKeyFilePath, int keySize) {
             string publicKey;
             string privateKey;
 
-            using (RSACryptoServiceProvider provider = new RSACryptoServiceProvider(2048)) {
+            using (RSACryptoServiceProvider provider = new RSACryptoServiceProvider(keySize)) {
                 publicKey = provider.ToXmlString(false);
                 privateKey = provider.ToXmlString(true);
             }
@@ -114,8 +117,7 @@ namespace JereckNET.LicenseManager.Signer {
                 sw.Close();
             }
         }
-
-        private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, string algorithm = "SHA256", int keySize = 2048) {
+        private bool signLicense(string privateKeyFilePath, string licenseContentPath, string licenseFilePath, bool base64, string algorithm, SecureString importPassword = null) {
             bool result;
 
             byte[] licenseContent = File.ReadAllBytes(licenseContentPath);
@@ -128,11 +130,9 @@ namespace JereckNET.LicenseManager.Signer {
 
                 string privateKey = File.ReadAllText(privateKeyFilePath);
 
-                result = newLicense.Sign(privateKey, keySize);
+                result = newLicense.Sign(privateKey);
             } else {
-                SecureString importPassword;
-
-                if (true) {
+                if (importPassword == null) {
                     Console.Write("Please type the import password: ");
                     importPassword = Program.GetConsoleSecurePassword();
                 }
