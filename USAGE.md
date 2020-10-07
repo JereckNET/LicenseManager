@@ -1,17 +1,17 @@
 # User Guide
 ## Table of contents
-* [Introduction]
-* [Generating the keys]
-  * [XML keys]
-  * [X.509 Certificates]
-* [Signing a license]
-  * [Using XML Keys]
-  * [Using a PFX file]
-  * [Using the certificate store]
-* [Validating the license]
-  * [In the console]
-  * [In your application]
-* [Complete usage]
+* [Introduction](#introduction)
+* [Generating the keys](#generating-the-keys)
+  * [XML keys](#xml-keys)
+  * [X.509 Certificates](#x.509-certificates)
+* [Signing a license](#signing-a-license)
+  * [Using XML Keys](#using-xml-Keys)
+  * [Using a PFX file](#using-a-pfx-file)
+  * [Using the certificate store](#using-the-certificate-store)
+* [Validating the license](#validating-the-license)
+  * [In the console](#in-the-console)
+  * [In your application](#in-your-application)
+* [Complete usage](#complete-usage)
 
 ## Introduction
 The public and private keys used to sign and validate the licenses come in different flavors.
