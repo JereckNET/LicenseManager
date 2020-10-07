@@ -91,6 +91,19 @@ namespace JereckNET.LicenseManager.Signer {
             Console.WriteLine("\tPassword\t\tThe password for the private key file.");
             Console.WriteLine("");
 
+            Console.WriteLine("/sign <Certificate Thumbprint> <License Content Path> <License Path> [/algorithm:<Algorithm>] [/base64]");
+            Console.WriteLine("\tUses the private key in the certificate store to sign the license content and generates a signed license file.");
+            Console.WriteLine("");
+            Console.WriteLine("\tCertificate Thumbprint\tThe thumbprint of the certificate containing the private key in the certificate store.");
+            Console.WriteLine("\t\t\t\t  The programm will look first in the current user's store, then in the computer's.");
+            Console.WriteLine("\t\t\t\t  The certificate key MUST be marked as exportable.");
+            Console.WriteLine("\tLicense Content Path\tThe path of the file that contains the license content.");
+            Console.WriteLine("\tLicense Path\t\tThe path of the file that will contain the signed license.");
+            Console.WriteLine("\tAlgorithm\t\tThe algorithm to use for the signature process [Default: SHA256].");
+            Console.WriteLine("\t\t\t\t  Accepted values are : SHA, SHA1, MD5, SHA256, SHA384, SHA512");
+            Console.WriteLine("\t/base64\t\t\tGenerates a Base64-encoded file instead of an XML file.");
+            Console.WriteLine("");
+
             Console.WriteLine("/verify <Public Key Path> <License Path>");
             Console.WriteLine("\tChecks the validity of a license file against a specified public key.");
             Console.WriteLine("");
@@ -126,7 +139,15 @@ namespace JereckNET.LicenseManager.Signer {
                 Content = licenseContent
             };
 
-            if (new FileInfo(privateKeyFilePath).Extension != ".pfx") {
+            if (Program.IsCertificateThumbprint(privateKeyFilePath)) {
+                using (X509Certificate2 certificate = findClientCertificate(privateKeyFilePath)) {
+                    if (certificate == null)
+                        throw new FileNotFoundException("Certificate not found in certificate stores.", privateKeyFilePath);
+
+                    result = newLicense.Sign(certificate);
+                }
+
+            } else if (new FileInfo(privateKeyFilePath).Extension != ".pfx") {
 
                 string privateKey = File.ReadAllText(privateKeyFilePath);
 
@@ -137,10 +158,11 @@ namespace JereckNET.LicenseManager.Signer {
                     importPassword = Program.GetConsoleSecurePassword();
                 }
 
-                X509Certificate2 certificate = new X509Certificate2(privateKeyFilePath, importPassword,
-                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+                using (X509Certificate2 certificate = new X509Certificate2(privateKeyFilePath, importPassword,
+                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet)) {
 
-                result = newLicense.Sign(certificate);
+                    result = newLicense.Sign(certificate);
+                }
             }
 
             if (result)
@@ -167,6 +189,26 @@ namespace JereckNET.LicenseManager.Signer {
             }
 
             return result;
+        }
+
+        private static X509Certificate2 findClientCertificate(string thumbprint) {
+            return findClientCertificate(thumbprint, StoreLocation.CurrentUser) ?? findClientCertificate(thumbprint, StoreLocation.LocalMachine);
+        }
+        private static X509Certificate2 findClientCertificate(string thumbprint, StoreLocation location) {
+            using (X509Store store = new X509Store(location)) {
+                store.Open(OpenFlags.ReadOnly);
+
+                X509Certificate2Collection certs = store.Certificates.Find(
+                    X509FindType.FindByThumbprint, thumbprint, false);
+
+                store.Close();
+
+                if (certs.Count == 0) {
+                    return null;
+                } else {
+                    return certs[0];
+                }
+            }
         }
     }
 }
