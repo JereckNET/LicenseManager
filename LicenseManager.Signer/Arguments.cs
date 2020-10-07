@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Security;
 
 namespace JereckNET.LicenseManager.Signer {
@@ -90,10 +92,14 @@ namespace JereckNET.LicenseManager.Signer {
                             break;
                         }
 
-                        if (File.Exists(args[1])) {
+                        if(Program.IsCertificateThumbprint(args[1])) {
                             PrivateKeyFilePath = args[1];
                         } else {
-                            showError("Private key file does not exists");
+                            if (File.Exists(args[1])) {
+                                PrivateKeyFilePath = args[1];
+                            } else {
+                                showError("Private key file does not exists");
+                            }
                         }
 
                         if (File.Exists(args[2])) {

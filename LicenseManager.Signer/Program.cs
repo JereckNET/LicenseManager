@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Numerics;
 using System.Reflection;
 using System.Security;
 
@@ -44,5 +46,14 @@ namespace JereckNET.LicenseManager.Signer {
             return pwd;
         }
 
+        /// <summary>
+        /// Tests a string to check if it is a valid string representation of a certificate's thumbprint.
+        /// </summary>
+        /// <param name="value">The string to test.</param>
+        /// <returns><see langword="true"/> if <paramref name="value"/> is a valid string representation of a certificate's thumbprint.</returns>
+        /// <remarks>The certificate thumbprint must be a 40-digits hexadecimal representation of the 160 bits SHA1 thumbprint.</remarks>
+        public static bool IsCertificateThumbprint(string value) {
+            return value.Length == 40 && BigInteger.TryParse(value, NumberStyles.HexNumber, null, out _);
+        }
     }
 }

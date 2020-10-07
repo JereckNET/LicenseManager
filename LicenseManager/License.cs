@@ -327,7 +327,6 @@ namespace JereckNET.LicenseManager {
                 throw new ArgumentException("The certificate must contain a private key", nameof(Certificate));
 
             string privateKeyXml = Certificate.PrivateKey.ToXmlString(true);
-            int keySize = Certificate.PrivateKey.KeySize;
 
             return Sign(privateKeyXml, out Error);
         }
