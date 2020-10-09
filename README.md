@@ -13,7 +13,7 @@ License Manager is a tool that allows developers to easily create software licen
 ### To use signed license files in your application
 | Component                     | Package                                                                                                                                              |
 |-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `JereckNET.LicenseManager` | [![LicenseHerald NuGet Package](https://img.shields.io/nuget/v/JereckNET.LicenseManager.svg)](https://www.nuget.org/packages/JereckNET.LicenseHerald) |
+| `JereckNET.LicenseManager` | [![LicenseHerald NuGet Package](https://img.shields.io/nuget/v/JereckNET.LicenseManager.svg)](https://www.nuget.org/packages/JereckNET.LicenseManager) |
 
 Install License Manager by searching for 'LicenseManager'  in the NuGet package manager, or using the Package Manager Console:
 
