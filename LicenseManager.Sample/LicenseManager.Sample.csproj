@@ -37,6 +37,19 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Licenses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Licenses\License1.lic">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Licenses\License2.lic">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
     <Exec Command="IF EXIST &quot;$(SolutionDir)\..\SignCode.cmd&quot; (&#xD;&#xA;   CALL &quot;$(SolutionDir)\..\SignCode.cmd&quot; &quot;$(DevEnvDir)&quot; &quot;$(TargetPath)&quot;&#xD;&#xA;)" />
   </Target>

@@ -119,7 +119,7 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="LicensePublicCertificateCRT" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\keys\license manager sample (custom).crt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\keys\custom.crt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="LicensePublicKey" xml:space="preserve">
     <value>&lt;RSAKeyValue&gt;&lt;Modulus&gt;2zKqTYqYTHjT/3S7yIQxaA42/M+GFkvEH2VJSs2Ybv70l07gvbkCk3OmJfYnLGJCWbPOxX3rsc7GhwVEuY9QAOqvmHGcJi28GLFUiiDqgr21DD3p4U/PSopygqFcMv61KO3T5SVpEpRP8N2n4/H4HRD5cBqFz21g913mmldrHFpin0AyesYx6XI5IY49hQkgdpRyx6rQoBi5DFSKAGSNYpoV2r90RZZ8kMEce8+FbSCQ+7W6C270QENOUveyjK6k+Khrp5KYKTZVhQvyDWScmsa5VBhecumWtCvIiiOXoJP1xlqbHOse/iQJh2V9OwXLVu6TKrzLDujzIBlpb25EZVLtcs9aLiGBPG5hrLehqGV3xfjbIt+VaXBz4sY9i7J3tFoa2RnYvM0QtPBHI1YrJxDc9igcV0qjVWWfICmNU9moYKkjvamYlZJYOnEAbOsDHwnoAqXgPsFf/hEme99ATPEisoK7AM+R5MOsZh/Mf6pjqtyppIKnct/cd1YgX8DjxTdIWNRHjyBpWAo2ANv6m7VLQUPCuLUCo2tMYAdLW5pxFHpwwrtTq6M41XMSNHuhxg7TX9mepRKZZhIE3k74i5lTuxmx4k0HaZ57mcWobihDUUSuHfXeu9ItZLdT0PQIpinsxA9ty3m3G2xXRePDmHmF5ZqPWo4bBtfP2RRj1dE=&lt;/Modulus&gt;&lt;Exponent&gt;AQAB&lt;/Exponent&gt;&lt;/RSAKeyValue&gt;</value>

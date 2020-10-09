@@ -68,7 +68,7 @@ namespace JereckNET.LicenseManager.Signer {
 
         private void showUsage(string applicationName) {
             Console.WriteLine("Usage: ");
-            Console.WriteLine($"{applicationName}.exe [{{ /generateKeys | /signLicense | /verifyLicense }} <options>]");
+            Console.WriteLine($"{applicationName}.exe [{{ /generateKeys | /sign | /verify }} <options>]");
             Console.WriteLine("");
 
             Console.WriteLine("/generateKeys <Public Key Path> <Private Key Path> [/keySize:<Key Size>]");
