@@ -38,7 +38,7 @@ if (status) {
 }
 ```
 
-Additional use cases are available in the [LicenseManager.Sample](/LicenseManager.Sample/) project.
+Additional use cases are available in the [LicenseManager.Sample](/LicenseManager.Sample/Program.cs) project.
 
 ## License
 

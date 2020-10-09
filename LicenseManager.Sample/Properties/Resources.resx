@@ -117,6 +117,27 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LicensePublicCertificateCER" xml:space="preserve">
+    <value>-----BEGIN CERTIFICATE-----
+MIIDDzCCAfegAwIBAgIQGmjQaAHb04BLzcfd/Ma/6DANBgkqhkiG9w0BAQUFADAq
+MSgwJgYDVQQDDB9MaWNlbnNlIE1hbmFnZXIgU2FtcGxlIChDdXN0b20pMB4XDTIw
+MTAwNzA3MjM1NloXDTMwMTAwNzA3MzM1NlowKjEoMCYGA1UEAwwfTGljZW5zZSBN
+YW5hZ2VyIFNhbXBsZSAoQ3VzdG9tKTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBAK2/uoYKpRtGyDWhS85dOwVYP2Z5Je/YR7l7OTjFdrxKZXhEPPtjwSLJ
+M6ZZfI21+0Z1LOXS6ha2dT4mvjUVRLHLsRuu1HWvgj7DGEXO47IQYoJhLxPYZObN
+gzQwNCj51dj6JuuZnD+U7nGn3qd+EI0bIon9kv1Ch8WNB3Df+z8ogWsp7A5RdRp8
+ZpPmrkLnj9n2VdvQfPOVxhFZ9vzn2Y2Dxmffg2XYUjlYJZeeCa5qoZNBKO65NUJ2
+JmkoZl9sukSxqu1o6Fxy/6GFBHBOOy947IiExkRudFyeBQ29IoQOSoo+4NvZO4n0
+2F13M2T6obacVZ7UvvviwY/0Klt9lykCAwEAAaMxMC8wDgYDVR0PAQH/BAQDAgWg
+MB0GA1UdDgQWBBTrQHQfiNc7qjtjoZ1PgrYaFqH+/zANBgkqhkiG9w0BAQUFAAOC
+AQEAdWiNtcmrxjoDAD/xor/BsIfBln0GeEzzaroRQMetp455nxFlNennS/OWbYRV
+daPo7VS0Jw7X/PCI/A4ky9H9fUGZXRVao1GWLMMVpQsPSJZcLFlMQ7S4CXqCYHHx
+UZMgREm4ou5FR4yXG3lfZg7KTcT6IyAbIJnaGiH+vFF9McEfuLPMqfES3tu6Fitq
+DiRpMhk/lljS9VA39cL5PL4TAgyvGwrtvGEfTJjfjEJZsmG5l4lp8xsswlu9P7bt
+E5KlA4TsFtCqu+VAG7A6P+p4jOqutNKm/a9VzF915Mfdr8cp5Hqx0479gssvel14
+u5ijYadr+0bPxgNQ4c5DW65zlw==
+-----END CERTIFICATE-----</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="LicensePublicCertificateCRT" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\keys\custom.crt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

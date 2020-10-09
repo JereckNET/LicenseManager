@@ -61,6 +61,23 @@ namespace JereckNET.LicenseManager.Sample.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to -----BEGIN CERTIFICATE-----
+        ///MIIDDzCCAfegAwIBAgIQGmjQaAHb04BLzcfd/Ma/6DANBgkqhkiG9w0BAQUFADAq
+        ///MSgwJgYDVQQDDB9MaWNlbnNlIE1hbmFnZXIgU2FtcGxlIChDdXN0b20pMB4XDTIw
+        ///MTAwNzA3MjM1NloXDTMwMTAwNzA3MzM1NlowKjEoMCYGA1UEAwwfTGljZW5zZSBN
+        ///YW5hZ2VyIFNhbXBsZSAoQ3VzdG9tKTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+        ///AQoCggEBAK2/uoYKpRtGyDWhS85dOwVYP2Z5Je/YR7l7OTjFdrxKZXhEPPtjwSLJ
+        ///M6ZZfI21+0Z1LOXS6ha2dT4mvjUVRLHLsRuu1HWvgj7DGEXO47IQYoJhLxPYZObN
+        ///gzQwNCj51dj6JuuZnD+U7nGn3qd+EI0bIon9kv1Ch8WNB3Df+z8ogWsp7A5RdRp8
+        ///ZpPmrkLnj9n2VdvQfPOVx [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string LicensePublicCertificateCER {
+            get {
+                return ResourceManager.GetString("LicensePublicCertificateCER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] LicensePublicCertificateCRT {
