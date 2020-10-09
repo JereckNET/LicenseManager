@@ -28,7 +28,18 @@ Download the [latest release](https://github.com/JereckNET/LicenseManager/releas
 See [USAGE](USAGE.md) file.
 
 ## Samples
-In the [to-do list](https://github.com/JereckNET/LicenseManager/issues/3) ...
+The easiest way is to use a XML public key and XML payload :
+```csharp
+License license = License.Load(@"Licenses\License1.lic");
+bool status = license.Verify(Properties.Resources.LicensePublicKey);
+if (status) {
+    LicenseData data = license.GetContentFromXML<LicenseData>();
+    // Do your own thing
+}
+```
+
+Additional use cases are available in the [LicenseManager.Sample](/LicenseManager.Sample/) project.
+
 ## License
 
 License Manager is licensed under the MIT License - the details are at [LICENSE.md](LICENSE.md)

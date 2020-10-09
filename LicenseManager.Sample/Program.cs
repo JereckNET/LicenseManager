@@ -7,6 +7,8 @@ using System.Xml.Serialization;
 
 namespace JereckNET.LicenseManager.Sample {
     class Program {
+#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable IDE0060 // Remove unused parameter
         static void Main(string[] args) {
             Console.WriteLine("Use case 1");
             sample1();
@@ -17,6 +19,8 @@ namespace JereckNET.LicenseManager.Sample {
             Console.WriteLine("Use case 3");
             sample3();
         }
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore IDE1006 // Naming Styles
 
         /// <summary>
         /// Use case 1 : 
