@@ -326,7 +326,8 @@ namespace JereckNET.LicenseManager {
             if (!Certificate.HasPrivateKey)
                 throw new ArgumentException("The certificate must contain a private key", nameof(Certificate));
 
-            string privateKeyXml = Certificate.PrivateKey.ToXmlString(true);
+            RSA privateKey = Certificate.GetRSAPrivateKey();
+            string privateKeyXml = privateKey.ToXmlString(true);
 
             return Sign(privateKeyXml, out Error);
         }
@@ -375,6 +376,30 @@ namespace JereckNET.LicenseManager {
                 byte[] data = Convert.FromBase64String(base64License);
 
                 return Encoding.UTF8.GetString(data);
+            }
+        }
+        #endregion
+
+        #region Content conversion
+        /// <summary>
+        /// Assumes that content data is XML and deserialize it as <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The license content type defined in the client application.</typeparam>
+        /// <returns>The license data deserialized as <typeparamref name="T"/>.</returns>
+        /// <exception cref="InvalidCastException">Thrown if license data is not an XML serialization of <typeparamref name="T"/>.</exception>
+        public T GetContentFromXML<T>() {
+            try {
+                using (MemoryStream ms = new MemoryStream(Content)) {
+                    T data;
+
+                    using (XmlReader xr = XmlReader.Create(ms)) {
+                        data = (T)new XmlSerializer(typeof(T)).Deserialize(xr);
+                    }
+
+                    return data;
+                }
+            }catch(Exception ex) {
+                throw new InvalidCastException($"License data could not be casted as {typeof(T)}", ex);
             }
         }
         #endregion

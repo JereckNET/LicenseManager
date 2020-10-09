@@ -9,10 +9,14 @@
     <Authors>Olivier PIRLET</Authors>
     <Company>Jereck.NET Consulting</Company>
     <Product>License Manager</Product>
-    <Copyright>Copyright (c) 2020 Jereck.NET Consulting.</Copyright>
+    <Description>License Manager signer application.</Description>
+    <Copyright>Copyright © Jereck.NET Consulting 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageId>JereckNET.Consulting.LicenseManager.Signer</PackageId>
     <StartupObject>JereckNET.LicenseManager.Signer.Program</StartupObject>
+    <PackageProjectUrl>https://github.com/JereckNET/LicenseManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JereckNET/LicenseManager.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <ApplicationIcon>Manager.ico</ApplicationIcon>
   </PropertyGroup>
 

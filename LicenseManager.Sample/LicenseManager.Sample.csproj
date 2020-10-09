@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <!--<TargetFrameworks>netstandard2.0;netcoreapp3.1;net48</TargetFrameworks>-->
+    <RootNamespace>JereckNET.LicenseManager.Sample</RootNamespace>
+    <AssemblyName>LicenseManager Sample</AssemblyName>
+    <Authors>Olivier PIRLET</Authors>
+    <Company>Jereck.NET Consulting</Company>
+    <Product>License Manager</Product>
+    <Description>Sample application for License Manager usage.</Description>
+    <Copyright>Copyright © Jereck.NET Consulting 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <StartupObject>JereckNET.LicenseManager.Sample.Program</StartupObject>
+    <PackageProjectUrl>https://github.com/JereckNET/LicenseManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JereckNET/LicenseManager.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LicenseManager\LicenseManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Licenses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Licenses\License1.lic">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Licenses\License2.lic">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="IF EXIST &quot;$(SolutionDir)\..\SignCode.cmd&quot; (&#xD;&#xA;   CALL &quot;$(SolutionDir)\..\SignCode.cmd&quot; &quot;$(DevEnvDir)&quot; &quot;$(TargetPath)&quot;&#xD;&#xA;)" />
+  </Target>
+
+</Project>
