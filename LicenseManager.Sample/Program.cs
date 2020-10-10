@@ -7,9 +7,14 @@ using System.Xml.Serialization;
 
 namespace JereckNET.LicenseManager.Sample {
     class Program {
-#pragma warning disable IDE1006 // Naming Styles
-#pragma warning disable IDE0060 // Remove unused parameter
-        static void Main(string[] args) {
+        public static void Main() {
+#if     NETFRAMEWORK
+            Console.WriteLine("Running as .NET Framework");
+#elif   NETCOREAPP                                  
+            Console.WriteLine("Running as .NET Core");
+#endif
+            Console.WriteLine();
+
             Console.WriteLine("**** Use case 1 ****");
             sample1();
             Console.WriteLine();
@@ -26,8 +31,6 @@ namespace JereckNET.LicenseManager.Sample {
             sample4();
             Console.WriteLine();
         }
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore IDE1006 // Naming Styles
 
         /// <summary>
         /// Use case 1 : 
@@ -147,7 +150,6 @@ namespace JereckNET.LicenseManager.Sample {
             }
         }
 
-
         private static byte[] fromBase64Certificate(string content) {
             StringBuilder base64Content = new StringBuilder();
 
@@ -157,7 +159,7 @@ namespace JereckNET.LicenseManager.Sample {
                 if (currentLine.StartsWith("-")) // Skip "-----BEGIN CERTIFICATE-----" line
                     currentLine = sr.ReadLine();
 
-                while (currentLine != null && !currentLine.StartsWith("-")){  // Skip "-----END CERTIFICATE-----" line
+                while (currentLine != null && !currentLine.StartsWith("-")) {  // Skip "-----END CERTIFICATE-----" line
                     base64Content.Append(currentLine);
 
                     currentLine = sr.ReadLine();
@@ -169,6 +171,5 @@ namespace JereckNET.LicenseManager.Sample {
                 return data;
             }
         }
-
     }
 }

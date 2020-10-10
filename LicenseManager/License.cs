@@ -18,10 +18,15 @@ namespace JereckNET.LicenseManager {
         private const string START_OF_FILE = "-----BEGIN LICENSE-----";
         private const string END_OF_FILE = "-----END LICENSE-----";
 
+        private const string RSA_OID = "1.2.840.113549.1.1.1";
+        private const string DSA_OID = "1.2.840.10040.4.1"; 
+        private const string ECC_OID = "1.2.840.10045.2.1";
+
+        #region Constructors
         /// <summary>
         /// Creates a new <see cref="License"/> instance with SHA256 signature algorithm.
         /// </summary>
-        public License(){
+        public License() {
             Signature = new Signature("SHA256");
         }
         /// <summary>
@@ -32,6 +37,7 @@ namespace JereckNET.LicenseManager {
         public License(string Algorithm) {
             Signature = new Signature(Algorithm);
         }
+        #endregion
 
         #region Properties
         /// <summary>
@@ -196,7 +202,6 @@ namespace JereckNET.LicenseManager {
 
             return result;
         }
-
         #endregion
 
         #region Verify()
@@ -204,27 +209,25 @@ namespace JereckNET.LicenseManager {
         /// Checks the validity of the signature.
         /// </summary>
         /// <param name="PublicKey">The XML encoded public key for your application license.<br />This key can be distributed freely.</param>
-        /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
         /// <returns><see langword="true"/> if the <see cref="Signature"/> corresponds to the <see cref="Content"/>.</returns>
-        public bool Verify(string PublicKey, int KeySize = 2048) {
-            return Verify(PublicKey, out _, KeySize);
+        public bool Verify(string PublicKey) {
+            return Verify(PublicKey, out _);
         }
         /// <summary>
         /// Checks the validity of the signature.
         /// </summary>
         /// <param name="PublicKey">The XML encoded public key for your application license.<br />This key can be distributed freely.</param>
         /// <param name="Error">The exception that prevented the signature to be verified.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
-        /// <param name="KeySize">The key size used to sign the content.<br/>Defaults to : <strong>2048</strong></param>
         /// <returns><see langword="true"/> if the <see cref="Signature"/> corresponds to the <see cref="Content"/>.</returns>
-        public bool Verify(string PublicKey, out Exception Error, int KeySize = 2048) {
+        public bool Verify(string PublicKey, out Exception Error) {
             Error = null;
             bool result;
 
             try {
-                using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider(KeySize)) {
-                    csp.FromXmlString(PublicKey);
+                using (RSA rsa = RSA.Create()) { 
+                    rsa.FromXmlString(PublicKey);
 
-                    result = csp.VerifyData(Content, Signature.Algorithm, Signature.Content);
+                    result = rsa.VerifyData(Content, Signature.Content, Signature.AlgorithmName, RSASignaturePadding.Pkcs1);
                 }
 
             } catch (Exception ex) {
@@ -255,8 +258,28 @@ namespace JereckNET.LicenseManager {
             Error = null;
 
             try {
-                using (RSACryptoServiceProvider csp = (RSACryptoServiceProvider)Certificate.PublicKey.Key) {
-                    result = csp.VerifyData(Content, Signature.Algorithm, Signature.Content);
+                switch (Certificate.PublicKey.Oid.Value) {
+                    case RSA_OID:
+                        using (RSA rsa = Certificate.GetRSAPublicKey()) {
+                            result = rsa.VerifyData(Content, Signature.Content, Signature.AlgorithmName, RSASignaturePadding.Pkcs1);
+                        }
+                        break;
+
+                    case DSA_OID:
+                        using(DSA dsa = Certificate.GetDSAPublicKey()) {
+                            result = dsa.VerifyData(Content, Signature.Content, Signature.AlgorithmName);
+                        }
+                        break;
+
+                    case ECC_OID:
+                        using (ECDsa ecc = Certificate.GetECDsaPublicKey()) {
+                            result = ecc.VerifyData(Content, Signature.Content, Signature.AlgorithmName);
+                        }
+                        // use the key
+                        break;
+
+                    default:
+                        throw new CryptographicException("Unable to load public key");
                 }
 
             } catch (Exception ex) {
@@ -289,10 +312,10 @@ namespace JereckNET.LicenseManager {
             bool result;
 
             try {
-                using (RSACryptoServiceProvider csp = new RSACryptoServiceProvider()) {
-                    csp.FromXmlString(PrivateKey);
+                using (RSA rsa = RSA.Create()) {
+                    rsa.FromXmlString(PrivateKey);
 
-                    Signature.Content = csp.SignData(Content, Signature.Algorithm);
+                    Signature.Content = rsa.SignData(Content, Signature.AlgorithmName, RSASignaturePadding.Pkcs1);
 
                     result = true;
                 }
@@ -323,13 +346,47 @@ namespace JereckNET.LicenseManager {
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
         /// <exception cref="ArgumentException">Thrown if the <see cref="X509Certificate2"/> does not contains a private key.</exception>
         public bool Sign(X509Certificate2 Certificate, out Exception Error) {
+            Error = null;
+            bool result;
+
             if (!Certificate.HasPrivateKey)
                 throw new ArgumentException("The certificate must contain a private key", nameof(Certificate));
 
-            RSA privateKey = Certificate.GetRSAPrivateKey();
-            string privateKeyXml = privateKey.ToXmlString(true);
+            try {
+                switch (Certificate.PublicKey.Oid.Value) {
+                    case RSA_OID:
+                        using (RSA rsa = Certificate.GetRSAPrivateKey()) {
+                            Signature.Content = rsa.SignData(Content, Signature.AlgorithmName, RSASignaturePadding.Pkcs1);
+                            result = true;
+                        }
+                        break;
 
-            return Sign(privateKeyXml, out Error);
+                    case DSA_OID:
+                        using(DSA dsa = Certificate.GetDSAPrivateKey()) {
+                            Signature.Content = dsa.SignData(Content, Signature.AlgorithmName);
+                            result = true;
+                        }
+                        break;
+
+                    case ECC_OID:
+                        using (ECDsa ecc = Certificate.GetECDsaPrivateKey()) {
+                            Signature.Content = ecc.SignData(Content, Signature.AlgorithmName);
+                            result = true;
+                        }
+                        // use the key
+                        break;
+
+                    default:
+                        throw new CryptographicException("Unable to load private key");
+                }
+
+            } catch (Exception ex) {
+                Debugger.Log(1, "Verify", ex.Message);
+                Error = ex;
+                result = false;
+            }
+
+            return result;
         }
         #endregion
 
@@ -398,7 +455,7 @@ namespace JereckNET.LicenseManager {
 
                     return data;
                 }
-            }catch(Exception ex) {
+            } catch (Exception ex) {
                 throw new InvalidCastException($"License data could not be casted as {typeof(T)}", ex);
             }
         }

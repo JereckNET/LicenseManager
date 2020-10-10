@@ -116,10 +116,17 @@ namespace JereckNET.LicenseManager.Signer {
             string publicKey;
             string privateKey;
 
-            using (RSACryptoServiceProvider provider = new RSACryptoServiceProvider(keySize)) {
-                publicKey = provider.ToXmlString(false);
-                privateKey = provider.ToXmlString(true);
-            }
+            RSA rsa;
+#if NETFRAMEWORK
+            rsa = new RSACryptoServiceProvider(keySize);
+#elif NETCOREAPP
+            rsa = RSA.Create();
+            rsa.KeySize = keySize;
+#endif
+
+            publicKey = rsa.ToXmlString(false);
+            privateKey = rsa.ToXmlString(true);
+            rsa.Dispose();
 
             using (StreamWriter sw = File.CreateText(publicKeyFilePath)) {
                 sw.Write(publicKey);

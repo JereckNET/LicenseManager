@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--<TargetFramework>net48</TargetFramework>-->
-    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net462</TargetFrameworks>
     <RootNamespace>JereckNET.LicenseManager</RootNamespace>
     <AssemblyName>JereckNET.LicenseManager</AssemblyName>
     <SignAssembly>true</SignAssembly>
@@ -19,7 +18,7 @@
     <RepositoryUrl>https://github.com/JereckNET/LicenseManager.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>Adds easy support for signed license files.</Description>
-    <Version>1.0.1</Version>
+    <Version>1.1</Version>
     <PackageIcon>License Manager.png</PackageIcon>
   </PropertyGroup>
 

@@ -14,6 +14,12 @@ namespace JereckNET.LicenseManager.Signer {
 
             Console.WriteLine($"License Manager [Version {currentVersion}]");
             Console.WriteLine("Copyright (c) 2020 Jereck.NET Consulting.  All rights reserved.");
+
+#if     DEBUG && NETFRAMEWORK
+            Console.WriteLine("Running as .NET Framework");
+#elif   DEBUG && NETCOREAPP                                  
+            Console.WriteLine("Running as .NET Core");
+#endif
             Console.WriteLine("");
 
             Manager main = new Manager(new Arguments(args), applicationName);

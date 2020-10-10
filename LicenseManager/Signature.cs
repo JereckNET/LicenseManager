@@ -6,8 +6,8 @@ namespace JereckNET.LicenseManager {
     /// Represents the signature of a <see cref="License"/>.
     /// </summary>
     public class Signature {
-        private string _algorithmName;
-        private HashAlgorithm _algorithm;
+        private string _algorithm;
+        private HashAlgorithmName _algorithmName;
 
         /// <summary>
         /// The signature data.
@@ -19,16 +19,16 @@ namespace JereckNET.LicenseManager {
         }
 
         /// <summary>
-        /// The name of the algorithm used to generate the signature data.
+        /// The algorithm used to generate the signature data.
         /// </summary>
         [XmlAttribute("algorithm")]
-        public string AlgorithmName {
+        public string Algorithm {
             get {
-                return _algorithmName;
+                return _algorithm;
             }
             set {
-                _algorithmName = value;
-                _algorithm = HashAlgorithm.Create(value);
+                _algorithm = value;
+                _algorithmName = new HashAlgorithmName(Algorithm);
             }
         }
 
@@ -36,9 +36,9 @@ namespace JereckNET.LicenseManager {
         /// The algorithm used to generate the signature data.
         /// </summary>
         [XmlIgnore]
-        public HashAlgorithm Algorithm {
+        public HashAlgorithmName AlgorithmName {
             get {
-                return _algorithm;
+                return _algorithmName;
             }
         }
 
@@ -46,16 +46,16 @@ namespace JereckNET.LicenseManager {
         /// Creates en ampty <see cref="Signature"/> using the SHA-256 signature algorithm.
         /// </summary>
         public Signature() {
-            _algorithmName = "SHA256";
-            _algorithm = SHA256.Create();
+            _algorithm = "SHA256";
+            _algorithmName = HashAlgorithmName.SHA256;
         }
         /// <summary>
         /// Creates en ampty <see cref="Signature"/> using the requested signature algoritm.
         /// </summary>
-        /// <param name="AlgorithmName">The name of the <see cref="HashAlgorithm"/> used as the signature algorithm.</param>
+        /// <param name="AlgorithmName">The <see cref="HashAlgorithmName"/> used as the signature algorithm.</param>
         public Signature(string AlgorithmName) {
-            _algorithmName = AlgorithmName;
-            _algorithm = HashAlgorithm.Create(AlgorithmName);
+            _algorithm = AlgorithmName;
+            _algorithmName = new HashAlgorithmName(AlgorithmName);
         }
     }
 }
