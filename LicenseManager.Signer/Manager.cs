@@ -3,6 +3,7 @@ using System.IO;
 using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace JereckNET.LicenseManager.Signer {
     internal class Manager {
@@ -185,19 +186,50 @@ namespace JereckNET.LicenseManager.Signer {
             if (licenseToVerify == null)
                 throw new ArgumentException("License file could not be read.");
 
-            if (new FileInfo(publicKeyFilePath).Extension != ".crt") {
+            if (new FileInfo(publicKeyFilePath).Extension == ".crt") {
+                using (X509Certificate2 certificate = new X509Certificate2(publicKeyFilePath)) {
+                    result = licenseToVerify.Verify(certificate);
+                }
+
+            }else if (new FileInfo(publicKeyFilePath).Extension == ".cer") {
+
+                byte[] CERData = fromBase64Certificate(publicKeyFilePath);
+                using (X509Certificate2 certificate = new X509Certificate2(CERData)) {
+                    result = licenseToVerify.Verify(certificate);
+                }
+
+            } else {
                 string publicKey = File.ReadAllText(publicKeyFilePath);
 
                 result = licenseToVerify.Verify(publicKey);
-            } else {
-                X509Certificate2 certificate = new X509Certificate2(publicKeyFilePath);
-
-                result = licenseToVerify.Verify(certificate);
             }
 
             return result;
         }
 
+        private static byte[] fromBase64Certificate(string publicKeyFilePath) {
+            string content = File.ReadAllText(publicKeyFilePath);
+
+            StringBuilder base64Content = new StringBuilder();
+
+            using (StringReader sr = new StringReader(content)) {
+                string currentLine = sr.ReadLine();
+
+                if (currentLine.StartsWith("-")) // Skip "-----BEGIN CERTIFICATE-----" line
+                    currentLine = sr.ReadLine();
+
+                while (currentLine != null && !currentLine.StartsWith("-")) {  // Skip "-----END CERTIFICATE-----" line
+                    base64Content.Append(currentLine);
+
+                    currentLine = sr.ReadLine();
+                }
+
+                string base64License = base64Content.ToString();
+                byte[] data = Convert.FromBase64String(base64License);
+
+                return data;
+            }
+        }
         private static X509Certificate2 findClientCertificate(string thumbprint) {
             return findClientCertificate(thumbprint, StoreLocation.CurrentUser) ?? findClientCertificate(thumbprint, StoreLocation.LocalMachine);
         }
