@@ -333,7 +333,6 @@ namespace JereckNET.LicenseManager {
         /// Generate the license signature and stores it in the <see cref="Signature"/> property.
         /// </summary>
         /// <param name="Certificate">The <see cref="X509Certificate2"/> containing the private key used to sign your application license.<br />This certificate <strong>MUST NEVER</strong> be distributed.</param>
-        /// <param name="Error">The exception that prevented the payload to be signed.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
         /// <exception cref="ArgumentException">Thrown if the <see cref="X509Certificate2"/> does not contains a private key.</exception>
         public bool Sign(X509Certificate2 Certificate) {
@@ -343,6 +342,7 @@ namespace JereckNET.LicenseManager {
         /// Generate the license signature and stores it in the <see cref="Signature"/> property.
         /// </summary>
         /// <param name="Certificate">The <see cref="X509Certificate2"/> containing the private key used to sign your application license.<br />This certificate <strong>MUST NEVER</strong> be distributed.</param>
+        /// <param name="Error">The exception that prevented the payload to be signed.<br />Will be <see langword="null"/> if the function returns <see langword="true"/>.</param>
         /// <returns><see langword="true"/> if the signature was successfully created.</returns>
         /// <exception cref="ArgumentException">Thrown if the <see cref="X509Certificate2"/> does not contains a private key.</exception>
         public bool Sign(X509Certificate2 Certificate, out Exception Error) {
